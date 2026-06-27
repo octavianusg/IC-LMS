@@ -127,6 +127,23 @@ struct ChallengeEditorViewModelTests {
         }
     }
 
+    @Test func concurrentEditsSerializeWithoutLosingUpdates() async {
+        let cloudKit = MockCloudKitManager()
+        let viewModel = makeViewModel(cloudKit: cloudKit)
+
+        async let first: Void = viewModel.addContent(.lesson, title: "A", to: .engage)
+        async let second: Void = viewModel.addAssignment(title: "B", to: .act)
+        _ = await (first, second)
+
+        #expect(viewModel.challenge.phase(.engage).items.count == 1)
+        #expect(viewModel.challenge.phase(.act).items.count == 1)
+
+        let stored = cloudKit.storedChallenges.first
+        #expect(stored?.phase(.engage).items.count == 1)
+        #expect(stored?.phase(.act).items.count == 1)
+        #expect(viewModel.isSaving == false)
+    }
+
     @Test func removeParticipantDeletesFromRoster() async {
         let cloudKit = MockCloudKitManager()
         let viewModel = makeViewModel(cloudKit: cloudKit)

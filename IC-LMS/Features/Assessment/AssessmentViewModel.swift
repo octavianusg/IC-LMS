@@ -9,6 +9,8 @@ final class AssessmentViewModel {
     private(set) var isSaving = false
     var currentError: AppError?
 
+    private var needsResave = false
+
     let skill: Skill
     let participant: Participant
 
@@ -97,16 +99,23 @@ final class AssessmentViewModel {
     }
 
     private func autosave() async {
+        if isSaving {
+            needsResave = true
+            return
+        }
         isSaving = true
         defer { isSaving = false }
-        do {
-            try await cloudKit.save(assessment)
-            log.debug("Autosaved assessment \(assessment.id)", category: .authoring)
-        } catch let error as AppError {
-            handle(error)
-        } catch {
-            handle(.unknown(message: error.localizedDescription))
-        }
+        repeat {
+            needsResave = false
+            do {
+                try await cloudKit.save(assessment)
+                log.debug("Autosaved assessment \(assessment.id)", category: .authoring)
+            } catch let error as AppError {
+                handle(error)
+            } catch {
+                handle(.unknown(message: error.localizedDescription))
+            }
+        } while needsResave
     }
 
     private func handle(_ error: AppError) {

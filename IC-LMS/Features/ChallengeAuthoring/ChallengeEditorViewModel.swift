@@ -8,6 +8,8 @@ final class ChallengeEditorViewModel {
     private(set) var isSaving = false
     var currentError: AppError?
 
+    private var needsResave = false
+
     let availableSkills: [Skill] = PredefinedSkillLibrary.all
 
     private let cloudKit: CloudKitManaging
@@ -69,16 +71,23 @@ final class ChallengeEditorViewModel {
     }
 
     private func autosave() async {
+        if isSaving {
+            needsResave = true
+            return
+        }
         isSaving = true
         defer { isSaving = false }
-        do {
-            try await cloudKit.save(challenge)
-            log.debug("Autosaved challenge \(challenge.id)", category: .authoring)
-        } catch let error as AppError {
-            handle(error)
-        } catch {
-            handle(.unknown(message: error.localizedDescription))
-        }
+        repeat {
+            needsResave = false
+            do {
+                try await cloudKit.save(challenge)
+                log.debug("Autosaved challenge \(challenge.id)", category: .authoring)
+            } catch let error as AppError {
+                handle(error)
+            } catch {
+                handle(.unknown(message: error.localizedDescription))
+            }
+        } while needsResave
     }
 
     private func validatedTitle(_ title: String) -> String? {
