@@ -5,6 +5,7 @@ struct ChallengeEditorView: View {
     @State private var addContext: AddItemContext?
     @State private var isAddingParticipant = false
     @State private var newParticipantName = ""
+    @State private var isSharing = false
     private let environment: AppEnvironment
 
     init(viewModel: ChallengeEditorViewModel, environment: AppEnvironment) {
@@ -55,6 +56,13 @@ struct ChallengeEditorView: View {
                     Label("Run", systemImage: "play.fill")
                 }
             }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    isSharing = true
+                } label: {
+                    Label("Share", systemImage: "person.crop.circle.badge.plus")
+                }
+            }
         }
         .sheet(item: $addContext) { context in
             AddItemSheet(
@@ -90,6 +98,9 @@ struct ChallengeEditorView: View {
         }
         .navigationDestination(for: ChallengeRunRoute.self) { route in
             ChallengeRunView(viewModel: environment.makeRunViewModel(for: route.challenge))
+        }
+        .sheet(isPresented: $isSharing) {
+            ChallengeShareSheet(challenge: viewModel.challenge, sharing: environment.sharing)
         }
         .errorAlert($viewModel.currentError)
     }

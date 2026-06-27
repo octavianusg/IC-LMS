@@ -21,6 +21,11 @@ struct RootView: View {
             DebugDataModeSwitch(environment: environment)
             #endif
         }
+        .sheet(item: Bindable(environment).pendingJoinedChallenge) { challenge in
+            NavigationStack {
+                StudentChallengeView(viewModel: environment.makeStudentViewModel(for: challenge))
+            }
+        }
         .task { await environment.refreshAccountStatus() }
     }
 }
