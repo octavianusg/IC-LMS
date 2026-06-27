@@ -12,11 +12,12 @@ struct CachedCloudKitManager: CloudKitManaging {
     }
 
     func save<T: CloudKitRecordConvertible>(_ model: T) async throws {
-        await cacheUpsert(model)
         do {
             try await live.save(model)
+            await cacheUpsert(model, pending: false)
         } catch let error as AppError where error.isOfflineLike {
-            log.info("Saved \(T.recordType) to cache while offline", category: .cloudKit)
+            await cacheUpsert(model, pending: true)
+            log.info("Saved \(T.recordType) to cache while offline (pending sync)", category: .cloudKit)
         }
     }
 
@@ -31,10 +32,11 @@ struct CachedCloudKitManager: CloudKitManaging {
     }
 
     func delete<T: CloudKitRecordConvertible>(_ model: T) async throws {
-        await cacheDelete(model)
         do {
             try await live.delete(model)
+            await cacheDelete(model)
         } catch let error as AppError where error.isOfflineLike {
+            await cacheDelete(model)
             log.info("Deleted \(T.recordType) from cache while offline", category: .cloudKit)
         }
     }
@@ -53,21 +55,35 @@ struct CachedCloudKitManager: CloudKitManaging {
     }
 
     private func refresh<R: CacheableRecord>(_ type: R.Type) async throws -> [R] {
+        await flushPending(R.self)
         do {
             let remote = try await live.fetchAll(R.self)
-            await cache.replaceAll(remote.map { (key: $0.cacheKey, value: $0) }, entity: R.cacheEntityName)
-            return remote
+            await cache.merge(remote.map { (key: $0.cacheKey, value: $0) }, entity: R.cacheEntityName)
+            return await cache.load(R.self, entity: R.cacheEntityName)
         } catch let error as AppError where error.isOfflineLike {
             log.info("Offline; serving cached \(R.cacheEntityName)", category: .cloudKit)
             return await cache.load(R.self, entity: R.cacheEntityName)
         }
     }
 
-    private func cacheUpsert<T: CloudKitRecordConvertible>(_ model: T) async {
+    private func flushPending<R: CacheableRecord>(_ type: R.Type) async {
+        let pending = await cache.pendingItems(R.self, entity: R.cacheEntityName)
+        for item in pending {
+            do {
+                try await live.save(item.value)
+            } catch let error as AppError where error.isOfflineLike {
+                return
+            } catch {
+                log.error("Pending push failed for \(R.cacheEntityName): \(error.localizedDescription)", category: .cloudKit)
+            }
+        }
+    }
+
+    private func cacheUpsert<T: CloudKitRecordConvertible>(_ model: T, pending: Bool) async {
         if let challenge = model as? Challenge {
-            await cache.upsert(challenge, key: challenge.cacheKey, entity: Challenge.cacheEntityName)
+            await cache.upsert(challenge, key: challenge.cacheKey, entity: Challenge.cacheEntityName, pending: pending)
         } else if let assessment = model as? CheckpointAssessment {
-            await cache.upsert(assessment, key: assessment.cacheKey, entity: CheckpointAssessment.cacheEntityName)
+            await cache.upsert(assessment, key: assessment.cacheKey, entity: CheckpointAssessment.cacheEntityName, pending: pending)
         }
     }
 
