@@ -13,6 +13,8 @@ final class CoreDataCache {
     private let payloadAttribute = "payload"
     private let pendingAttribute = "pendingPush"
 
+    private var lastRefresh: [String: Date] = [:]
+
     init(log: LogManaging, inMemory: Bool = false) {
         self.log = log
         let model = CoreDataCache.makeModel(
@@ -34,6 +36,15 @@ final class CoreDataCache {
                 self?.isReady = true
             }
         }
+    }
+
+    func shouldRefresh(entity: String, minInterval: TimeInterval) -> Bool {
+        let now = Date()
+        if let last = lastRefresh[entity], now.timeIntervalSince(last) < minInterval {
+            return false
+        }
+        lastRefresh[entity] = now
+        return true
     }
 
     func load<T: Codable>(_ type: T.Type, entity: String) -> [T] {

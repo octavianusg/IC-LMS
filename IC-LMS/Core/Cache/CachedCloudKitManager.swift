@@ -4,6 +4,7 @@ struct CachedCloudKitManager: CloudKitManaging {
     private let live: CloudKitManaging
     private let cache: CoreDataCache
     private let log: LogManaging
+    private let backgroundRefreshInterval: TimeInterval = 30
 
     init(live: CloudKitManaging, cache: CoreDataCache, log: LogManaging) {
         self.live = live
@@ -50,7 +51,9 @@ struct CachedCloudKitManager: CloudKitManaging {
         if cached.isEmpty {
             return try await refresh(R.self)
         }
-        Task { _ = try? await refresh(R.self) }
+        if await cache.shouldRefresh(entity: R.cacheEntityName, minInterval: backgroundRefreshInterval) {
+            Task { _ = try? await refresh(R.self) }
+        }
         return cached
     }
 

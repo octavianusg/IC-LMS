@@ -44,6 +44,24 @@ struct CoreDataCacheTests {
         #expect(cache.load(Challenge.self, entity: entity).count == 1)
     }
 
+    @Test func shouldRefreshThrottlesRepeatedCalls() {
+        let cache = makeCache()
+        #expect(cache.shouldRefresh(entity: entity, minInterval: 60))
+        #expect(cache.shouldRefresh(entity: entity, minInterval: 60) == false)
+    }
+
+    @Test func shouldRefreshAllowsWhenIntervalElapsed() {
+        let cache = makeCache()
+        #expect(cache.shouldRefresh(entity: entity, minInterval: 0))
+        #expect(cache.shouldRefresh(entity: entity, minInterval: 0))
+    }
+
+    @Test func shouldRefreshTracksEntitiesIndependently() {
+        let cache = makeCache()
+        #expect(cache.shouldRefresh(entity: "CachedChallenge", minInterval: 60))
+        #expect(cache.shouldRefresh(entity: "CachedAssessment", minInterval: 60))
+    }
+
     @Test func pendingItemsReturnsOnlyUnsyncedRecords() {
         let cache = makeCache()
         let offline = Challenge(title: "Offline")
