@@ -5,11 +5,11 @@ struct ChallengeEditorView: View {
     @State private var addContext: AddItemContext?
     @State private var isAddingParticipant = false
     @State private var newParticipantName = ""
-    private let dependencies: AppDependencies
+    private let environment: AppEnvironment
 
-    init(viewModel: ChallengeEditorViewModel, dependencies: AppDependencies) {
+    init(viewModel: ChallengeEditorViewModel, environment: AppEnvironment) {
         _viewModel = State(initialValue: viewModel)
-        self.dependencies = dependencies
+        self.environment = environment
     }
 
     private var challengeID: UUID { viewModel.challenge.id }
@@ -81,7 +81,7 @@ struct ChallengeEditorView: View {
         }
         .navigationDestination(for: ParticipantAssessmentRoute.self) { route in
             CheckpointAssessmentView(
-                viewModel: dependencies.makeAssessmentViewModel(
+                viewModel: environment.makeAssessmentViewModel(
                     challengeID: route.challengeID,
                     checkpoint: route.checkpoint,
                     participant: route.participant
@@ -89,7 +89,7 @@ struct ChallengeEditorView: View {
             )
         }
         .navigationDestination(for: ChallengeRunRoute.self) { route in
-            ChallengeRunView(viewModel: dependencies.makeRunViewModel(for: route.challenge))
+            ChallengeRunView(viewModel: environment.makeRunViewModel(for: route.challenge))
         }
         .errorAlert($viewModel.currentError)
     }

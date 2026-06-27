@@ -4,11 +4,11 @@ struct ChallengeListView: View {
     @State private var viewModel: ChallengeListViewModel
     @State private var isPresentingNew = false
     @State private var newTitle = ""
-    private let dependencies: AppDependencies
+    private let environment: AppEnvironment
 
-    init(viewModel: ChallengeListViewModel, dependencies: AppDependencies) {
+    init(viewModel: ChallengeListViewModel, environment: AppEnvironment) {
         _viewModel = State(initialValue: viewModel)
-        self.dependencies = dependencies
+        self.environment = environment
     }
 
     var body: some View {
@@ -36,8 +36,8 @@ struct ChallengeListView: View {
             }
             .navigationDestination(for: Challenge.self) { challenge in
                 ChallengeEditorView(
-                    viewModel: dependencies.makeChallengeEditorViewModel(for: challenge),
-                    dependencies: dependencies
+                    viewModel: environment.makeChallengeEditorViewModel(for: challenge),
+                    environment: environment
                 )
             }
             .sheet(isPresented: $isPresentingNew) { newChallengeSheet }
