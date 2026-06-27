@@ -75,6 +75,7 @@ struct Challenge: Identifiable, Equatable, Hashable, Codable, Sendable {
 
 extension Challenge: CloudKitRecordConvertible {
     static let recordType = "Challenge"
+    static var zoneID: CKRecordZone.ID { CloudKitZone.shareableID }
 
     private enum Field {
         static let title = "title"
@@ -87,7 +88,7 @@ extension Challenge: CloudKitRecordConvertible {
     }
 
     var recordID: CKRecord.ID {
-        CKRecord.ID(recordName: id.uuidString)
+        CKRecord.ID(recordName: id.uuidString, zoneID: Challenge.zoneID)
     }
 
     init(record: CKRecord) throws {

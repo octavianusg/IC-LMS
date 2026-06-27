@@ -42,7 +42,7 @@ extension Submission: CloudKitRecordConvertible {
     }
 
     var recordID: CKRecord.ID {
-        CKRecord.ID(recordName: id.uuidString)
+        CKRecord.ID(recordName: id.uuidString, zoneID: Submission.zoneID)
     }
 
     init(record: CKRecord) throws {

@@ -57,11 +57,13 @@ methods:
 
 ## 4. Known code gaps to address before relying on LIVE features
 
-- [ ] **CKShare requires a custom record zone.** `CloudKitManager` /
-      `CloudKitSharingManager` currently use the **default** private zone, which
-      does not support sharing. To make `CKShare` actually work, save shareable
-      `Challenge` records into a custom `CKRecordZone` and share from there.
-      (Sharing UI and accept-handling are wired; the zone is the missing piece.)
+- [x] **CKShare custom record zone — implemented.** `Challenge` records now
+      live in a custom zone (`CloudKitZone.shareableID`, zone name "Challenges");
+      `CloudKitManager` / `CloudKitSharingManager` ensure the zone exists before
+      saving/sharing and query within it. Assessments and submissions still use
+      the default zone (teacher‑private in v1). Propagating child records
+      (assessments/submissions) **through** a share to other users is a future
+      step.
 - [ ] **Photos are stored as `Data` in records.** Evidence/Submission images go
       into record `Bytes` fields, which hit CloudKit's ~1 MB record limit fast.
       Move image payloads to **`CKAsset`** for production.
@@ -105,7 +107,7 @@ methods:
       offline; reconnect → changes sync.
 - [ ] **Sharing:** tap **Share** on a challenge → invite via the system sheet →
       accept on a second device/Apple ID → the shared challenge opens in the
-      student view. *(Requires the custom‑zone fix in §4.)*
+      student view.
 
 ### Pencil & hardware
 - [ ] Apple Pencil drawing feels natural on the handwriting canvas (PencilKit).

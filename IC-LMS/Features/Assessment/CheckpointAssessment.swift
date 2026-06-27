@@ -73,7 +73,7 @@ extension CheckpointAssessment: CloudKitRecordConvertible {
     }
 
     var recordID: CKRecord.ID {
-        CKRecord.ID(recordName: id.uuidString)
+        CKRecord.ID(recordName: id.uuidString, zoneID: CheckpointAssessment.zoneID)
     }
 
     init(record: CKRecord) throws {

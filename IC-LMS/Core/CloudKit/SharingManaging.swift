@@ -18,11 +18,13 @@ struct CloudKitSharingManager: SharingManaging {
     }
 
     func makeShare(for challenge: Challenge) async throws -> CKShare {
+        let database = container.privateCloudDatabase
         let record = challenge.toRecord()
         let share = CKShare(rootRecord: record)
         share[CKShare.SystemFieldKey.title] = challenge.title as CKRecordValue
         do {
-            _ = try await container.privateCloudDatabase.modifyRecords(saving: [record, share], deleting: [])
+            _ = try await database.modifyRecordZones(saving: [CKRecordZone(zoneID: Challenge.zoneID)], deleting: [])
+            _ = try await database.modifyRecords(saving: [record, share], deleting: [])
             log.info("Created share for challenge \(challenge.id)", category: .cloudKit)
             return share
         } catch {
