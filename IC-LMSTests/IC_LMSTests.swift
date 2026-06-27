@@ -1,19 +1,27 @@
-//
-//  IC_LMSTests.swift
-//  IC-LMSTests
-//
-//  Created by octavianus on 27/06/26.
-//
-
 import Testing
 @testable import IC_LMS
 
-struct IC_LMSTests {
+@Suite("PredefinedSkillLibrary")
+struct PredefinedSkillLibraryTests {
 
-    @Test func example() async throws {
-        // Write your test here and use APIs like `#expect(...)` to check expected conditions.
-        // Swift Testing Documentation
-        // https://developer.apple.com/documentation/testing
+    @Test func libraryIsNotEmpty() {
+        #expect(!PredefinedSkillLibrary.all.isEmpty)
     }
 
+    @Test func skillIDsAreUnique() {
+        let ids = PredefinedSkillLibrary.all.map(\.id)
+        #expect(Set(ids).count == ids.count)
+    }
+
+    @Test func everySkillHasAnchors() {
+        for skill in PredefinedSkillLibrary.all {
+            #expect(!skill.defaultAnchors.isEmpty)
+        }
+    }
+
+    @Test func lookupByIDReturnsMatchingSkill() {
+        let first = PredefinedSkillLibrary.all[0]
+        #expect(PredefinedSkillLibrary.skill(withID: first.id) == first)
+        #expect(PredefinedSkillLibrary.skill(withID: "does-not-exist") == nil)
+    }
 }
