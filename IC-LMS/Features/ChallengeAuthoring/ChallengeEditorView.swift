@@ -45,9 +45,14 @@ struct ChallengeEditorView: View {
         .navigationTitle(viewModel.challenge.title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            if viewModel.isSaving {
-                ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItem(placement: .topBarTrailing) {
+                if viewModel.isSaving {
                     ProgressView()
+                }
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                NavigationLink(value: ChallengeRunRoute(challenge: viewModel.challenge)) {
+                    Label("Run", systemImage: "play.fill")
                 }
             }
         }
@@ -82,6 +87,9 @@ struct ChallengeEditorView: View {
                     participant: route.participant
                 )
             )
+        }
+        .navigationDestination(for: ChallengeRunRoute.self) { route in
+            ChallengeRunView(viewModel: dependencies.makeRunViewModel(for: route.challenge))
         }
         .errorAlert($viewModel.currentError)
     }

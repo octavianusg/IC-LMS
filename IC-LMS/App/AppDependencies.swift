@@ -30,4 +30,8 @@ struct AppDependencies {
             log: log
         )
     }
+
+    func makeRunViewModel(for challenge: Challenge) -> ChallengeRunViewModel {
+        ChallengeRunViewModel(challenge: challenge, log: log)
+    }
 }
