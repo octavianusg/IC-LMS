@@ -1,7 +1,7 @@
 import CloudKit
 import Foundation
 
-struct CheckpointAssessment: Identifiable, Equatable, Sendable {
+struct CheckpointAssessment: Identifiable, Equatable, Codable, Sendable {
     var id: UUID
     var challengeID: UUID
     var checkpointID: UUID

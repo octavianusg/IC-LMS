@@ -1,7 +1,7 @@
 import CloudKit
 import Foundation
 
-struct Challenge: Identifiable, Equatable, Hashable, Sendable {
+struct Challenge: Identifiable, Equatable, Hashable, Codable, Sendable {
     var id: UUID
     var title: String
     var summary: String

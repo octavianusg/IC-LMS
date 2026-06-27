@@ -9,23 +9,42 @@ final class AppEnvironment {
         case mock
     }
 
-    var dataMode: DataMode
+    var dataMode: DataMode {
+        didSet {
+            guard oldValue != dataMode else { return }
+            Task { await refreshAccountStatus() }
+        }
+    }
+
+    private(set) var accountStatus: AccountStatus = .unknown
 
     let log: LogManaging
     private let liveSource: CloudKitManaging
     private let mockSource: CloudKitManaging
+    private let accountProvider: AccountStatusProviding
 
-    init(dataMode: DataMode, log: LogManaging, liveSource: CloudKitManaging, mockSource: CloudKitManaging) {
+    init(
+        dataMode: DataMode,
+        log: LogManaging,
+        liveSource: CloudKitManaging,
+        mockSource: CloudKitManaging,
+        accountProvider: AccountStatusProviding
+    ) {
         self.dataMode = dataMode
         self.log = log
         self.liveSource = liveSource
         self.mockSource = mockSource
+        self.accountProvider = accountProvider
     }
 
     var isMock: Bool { dataMode == .mock }
 
     var activeSource: CloudKitManaging {
         dataMode == .mock ? mockSource : liveSource
+    }
+
+    func refreshAccountStatus() async {
+        accountStatus = isMock ? .available : await accountProvider.currentStatus()
     }
 
     func makeChallengeListViewModel() -> ChallengeListViewModel {
@@ -56,6 +75,8 @@ final class AppEnvironment {
 
     static func makeDefault() -> AppEnvironment {
         let log = LogManager()
+        let cache = CoreDataCache(log: log)
+        let liveSource = CachedCloudKitManager(live: CloudKitManager(), cache: cache, log: log)
         #if DEBUG
         let mode: DataMode = .mock
         #else
@@ -64,8 +85,9 @@ final class AppEnvironment {
         return AppEnvironment(
             dataMode: mode,
             log: log,
-            liveSource: CloudKitManager(),
-            mockSource: MockDataSource()
+            liveSource: liveSource,
+            mockSource: MockDataSource(),
+            accountProvider: CloudKitAccountProvider()
         )
     }
 }

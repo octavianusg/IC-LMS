@@ -28,6 +28,15 @@ enum AppError: LocalizedError, Equatable {
         }
     }
 
+    var isOfflineLike: Bool {
+        switch self {
+        case .notSignedIntoiCloud, .networkUnavailable:
+            return true
+        default:
+            return false
+        }
+    }
+
     var diagnosticDescription: String {
         switch self {
         case .persistenceFailed(let reason):
