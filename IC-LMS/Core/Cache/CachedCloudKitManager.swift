@@ -55,7 +55,7 @@ struct CachedCloudKitManager: CloudKitManaging {
     private func refresh<R: CacheableRecord>(_ type: R.Type) async throws -> [R] {
         do {
             let remote = try await live.fetchAll(R.self)
-            await cache.replaceAll(remote.map { ($0.cacheKey, $0) }, entity: R.cacheEntityName)
+            await cache.replaceAll(remote.map { (key: $0.cacheKey, value: $0) }, entity: R.cacheEntityName)
             return remote
         } catch let error as AppError where error.isOfflineLike {
             log.info("Offline; serving cached \(R.cacheEntityName)", category: .cloudKit)

@@ -2,7 +2,8 @@ import SwiftUI
 
 struct DebugDataModeSwitch: View {
     @Bindable var environment: AppEnvironment
-    @State private var dragOffset: CGSize = .zero
+    @State private var position: CGSize = .zero
+    @State private var dragTranslation: CGSize = .zero
     @State private var isExpanded = false
 
     private var isMock: Bool { environment.dataMode == .mock }
@@ -12,10 +13,18 @@ struct DebugDataModeSwitch: View {
             .padding(AppSpacing.sm)
             .glassEffect(.regular.interactive(), in: .capsule)
             .padding(AppSpacing.lg)
-            .offset(dragOffset)
+            .offset(
+                x: position.width + dragTranslation.width,
+                y: position.height + dragTranslation.height
+            )
             .gesture(
                 DragGesture()
-                    .onChanged { dragOffset = $0.translation }
+                    .onChanged { dragTranslation = $0.translation }
+                    .onEnded {
+                        position.width += $0.translation.width
+                        position.height += $0.translation.height
+                        dragTranslation = .zero
+                    }
             )
     }
 

@@ -19,22 +19,24 @@ final class AppEnvironment {
     private(set) var accountStatus: AccountStatus = .unknown
 
     let log: LogManaging
-    private let liveSource: CloudKitManaging
     private let mockSource: CloudKitManaging
     private let accountProvider: AccountStatusProviding
+
+    @ObservationIgnored private let liveSourceFactory: () -> CloudKitManaging
+    @ObservationIgnored private lazy var liveSource: CloudKitManaging = liveSourceFactory()
 
     init(
         dataMode: DataMode,
         log: LogManaging,
-        liveSource: CloudKitManaging,
         mockSource: CloudKitManaging,
-        accountProvider: AccountStatusProviding
+        accountProvider: AccountStatusProviding,
+        liveSourceFactory: @escaping () -> CloudKitManaging
     ) {
         self.dataMode = dataMode
         self.log = log
-        self.liveSource = liveSource
         self.mockSource = mockSource
         self.accountProvider = accountProvider
+        self.liveSourceFactory = liveSourceFactory
     }
 
     var isMock: Bool { dataMode == .mock }
@@ -79,8 +81,6 @@ final class AppEnvironment {
 
     static func makeDefault() -> AppEnvironment {
         let log = LogManager()
-        let cache = CoreDataCache(log: log)
-        let liveSource = CachedCloudKitManager(live: CloudKitManager(), cache: cache, log: log)
         #if DEBUG
         let mode: DataMode = .mock
         #else
@@ -89,9 +89,11 @@ final class AppEnvironment {
         return AppEnvironment(
             dataMode: mode,
             log: log,
-            liveSource: liveSource,
             mockSource: MockDataSource(),
-            accountProvider: CloudKitAccountProvider()
+            accountProvider: CloudKitAccountProvider(),
+            liveSourceFactory: {
+                CachedCloudKitManager(live: CloudKitManager(), cache: CoreDataCache(log: log), log: log)
+            }
         )
     }
 }

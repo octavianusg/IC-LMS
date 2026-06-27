@@ -1,6 +1,6 @@
 import CloudKit
 
-enum AccountStatus: Sendable {
+enum AccountStatus: Equatable, Sendable {
     case available
     case noAccount
     case restricted
@@ -27,13 +27,14 @@ protocol AccountStatusProviding: Sendable {
 }
 
 struct CloudKitAccountProvider: AccountStatusProviding {
-    private let container: CKContainer
+    private let containerOverride: CKContainer?
 
-    init(container: CKContainer = .default()) {
-        self.container = container
+    init(container: CKContainer? = nil) {
+        self.containerOverride = container
     }
 
     func currentStatus() async -> AccountStatus {
+        let container = containerOverride ?? .default()
         do {
             switch try await container.accountStatus() {
             case .available:
