@@ -66,9 +66,9 @@ final class AssessmentViewModel {
         await add(evidence)
     }
 
-    func addHandwriting(drawingData: Data, annotatedPhoto: Data?, caption: String) async {
-        let kind: EvidenceKind = annotatedPhoto == nil ? .handwritingBlank : .handwritingAnnotation
-        let evidence = Evidence(kind: kind, caption: caption, imageData: annotatedPhoto, drawingData: drawingData)
+    func addHandwriting(imageData: Data, isAnnotation: Bool, caption: String) async {
+        let kind: EvidenceKind = isAnnotation ? .handwritingAnnotation : .handwritingBlank
+        let evidence = Evidence(kind: kind, caption: caption, imageData: imageData)
         await add(evidence)
     }
 

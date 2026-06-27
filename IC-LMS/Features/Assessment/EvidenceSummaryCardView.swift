@@ -1,4 +1,3 @@
-import PencilKit
 import SwiftUI
 import UIKit
 
@@ -60,33 +59,6 @@ struct EvidenceSummaryCardView: View {
 
 enum EvidenceRenderer {
     static func image(for evidence: Evidence) -> UIImage? {
-        let base = evidence.imageData.flatMap(UIImage.init)
-        let overlay = drawingImage(from: evidence.drawingData)
-
-        switch (base, overlay) {
-        case let (base?, overlay?):
-            return composite(base: base, overlay: overlay)
-        case let (base?, nil):
-            return base
-        case let (nil, overlay?):
-            return overlay
-        default:
-            return nil
-        }
-    }
-
-    private static func drawingImage(from data: Data?) -> UIImage? {
-        guard let data, let drawing = try? PKDrawing(data: data), !drawing.bounds.isEmpty else {
-            return nil
-        }
-        return drawing.image(from: drawing.bounds, scale: 2)
-    }
-
-    private static func composite(base: UIImage, overlay: UIImage) -> UIImage {
-        let renderer = UIGraphicsImageRenderer(size: base.size)
-        return renderer.image { _ in
-            base.draw(in: CGRect(origin: .zero, size: base.size))
-            overlay.draw(in: CGRect(origin: .zero, size: base.size))
-        }
+        evidence.imageData.flatMap(UIImage.init)
     }
 }

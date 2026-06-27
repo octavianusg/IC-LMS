@@ -97,8 +97,8 @@ struct CheckpointAssessmentView: View {
         switch result {
         case let .photoNote(imageData, caption):
             await viewModel.addPhotoNote(imageData: imageData, caption: caption)
-        case let .handwriting(drawingData, annotatedPhoto, caption):
-            await viewModel.addHandwriting(drawingData: drawingData, annotatedPhoto: annotatedPhoto, caption: caption)
+        case let .handwriting(imageData, isAnnotation, caption):
+            await viewModel.addHandwriting(imageData: imageData, isAnnotation: isAnnotation, caption: caption)
         case let .studentUpload(imageData, caption):
             await viewModel.addStudentUpload(imageData: imageData, caption: caption)
         }

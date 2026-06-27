@@ -35,21 +35,18 @@ struct Evidence: Identifiable, Codable, Equatable, Sendable {
     var caption: String
     var createdAt: Date
     var imageData: Data?
-    var drawingData: Data?
 
     init(
         id: UUID = UUID(),
         kind: EvidenceKind,
         caption: String = "",
         createdAt: Date = Date(),
-        imageData: Data? = nil,
-        drawingData: Data? = nil
+        imageData: Data? = nil
     ) {
         self.id = id
         self.kind = kind
         self.caption = caption
         self.createdAt = createdAt
         self.imageData = imageData
-        self.drawingData = drawingData
     }
 }

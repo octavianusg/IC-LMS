@@ -5,7 +5,7 @@ import UIKit
 
 enum EvidenceCaptureResult {
     case photoNote(imageData: Data, caption: String)
-    case handwriting(drawingData: Data, annotatedPhoto: Data?, caption: String)
+    case handwriting(imageData: Data, isAnnotation: Bool, caption: String)
     case studentUpload(imageData: Data, caption: String)
 }
 
@@ -26,6 +26,7 @@ struct EvidenceCaptureSheet: View {
     @State private var pickerItem: PhotosPickerItem?
     @State private var imageData: Data?
     @State private var drawing = PKDrawing()
+    @State private var canvasSize: CGSize = .zero
 
     var body: some View {
         NavigationStack {
@@ -96,6 +97,13 @@ struct EvidenceCaptureSheet: View {
             }
             .frame(height: 280)
             .frame(maxWidth: .infinity)
+            .background {
+                GeometryReader { proxy in
+                    Color.clear
+                        .onAppear { canvasSize = proxy.size }
+                        .onChange(of: proxy.size) { _, newValue in canvasSize = newValue }
+                }
+            }
             .background(AppColor.paperRaised)
             .clipShape(.rect(cornerRadius: AppRadius.small))
             .overlay {
@@ -131,11 +139,9 @@ struct EvidenceCaptureSheet: View {
             guard let imageData else { return }
             onCapture(.studentUpload(imageData: imageData, caption: caption))
         case .handwriting:
-            onCapture(.handwriting(
-                drawingData: drawing.dataRepresentation(),
-                annotatedPhoto: imageData,
-                caption: caption
-            ))
+            let photo = imageData.flatMap(UIImage.init)
+            let flattened = EvidenceImageComposer.flatten(drawing: drawing, photo: photo, in: canvasSize)
+            onCapture(.handwriting(imageData: flattened, isAnnotation: photo != nil, caption: caption))
         }
         dismiss()
     }

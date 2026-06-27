@@ -7,10 +7,12 @@ struct ChallengeEditorView: View {
     @State private var newParticipantName = ""
     @State private var isSharing = false
     private let environment: AppEnvironment
+    private let onClose: () -> Void
 
-    init(viewModel: ChallengeEditorViewModel, environment: AppEnvironment) {
+    init(viewModel: ChallengeEditorViewModel, environment: AppEnvironment, onClose: @escaping () -> Void = {}) {
         _viewModel = State(initialValue: viewModel)
         self.environment = environment
+        self.onClose = onClose
     }
 
     private var challengeID: UUID { viewModel.challenge.id }
@@ -103,6 +105,7 @@ struct ChallengeEditorView: View {
             ChallengeShareSheet(challenge: viewModel.challenge, sharing: environment.sharing)
         }
         .errorAlert($viewModel.currentError)
+        .onDisappear { onClose() }
     }
 
     private var header: some View {

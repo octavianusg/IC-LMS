@@ -38,7 +38,8 @@ struct ChallengeListView: View {
             .navigationDestination(for: Challenge.self) { challenge in
                 ChallengeEditorView(
                     viewModel: environment.makeChallengeEditorViewModel(for: challenge),
-                    environment: environment
+                    environment: environment,
+                    onClose: { Task { await viewModel.load() } }
                 )
             }
             .navigationDestination(item: $studentRoute) { route in
@@ -72,6 +73,7 @@ struct ChallengeListView: View {
             }
             .padding(AppSpacing.lg)
         }
+        .refreshable { await viewModel.load() }
     }
 
     private var emptyState: some View {

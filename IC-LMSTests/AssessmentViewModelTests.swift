@@ -73,8 +73,8 @@ struct AssessmentViewModelTests {
     @Test func handwritingKindDependsOnPhotoPresence() async {
         let viewModel = makeViewModel(checkpoint: makeCheckpoint())
 
-        await viewModel.addHandwriting(drawingData: Data([0x2]), annotatedPhoto: nil, caption: "")
-        await viewModel.addHandwriting(drawingData: Data([0x3]), annotatedPhoto: Data([0x4]), caption: "")
+        await viewModel.addHandwriting(imageData: Data([0x2]), isAnnotation: false, caption: "")
+        await viewModel.addHandwriting(imageData: Data([0x3]), isAnnotation: true, caption: "")
 
         let kinds = viewModel.orderedEvidence.map(\.kind)
         #expect(kinds == [.handwritingBlank, .handwritingAnnotation])
