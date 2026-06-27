@@ -4,6 +4,7 @@ final class MockDataSource: CloudKitManaging, @unchecked Sendable {
     private let lock = NSLock()
     private var challenges: [Challenge]
     private var assessments: [CheckpointAssessment]
+    private var submissions: [Submission] = []
 
     init() {
         let seeded = SampleData.challenges()
@@ -17,6 +18,8 @@ final class MockDataSource: CloudKitManaging, @unchecked Sendable {
             upsert(challenge, into: &challenges)
         } else if let assessment = model as? CheckpointAssessment {
             upsert(assessment, into: &assessments)
+        } else if let submission = model as? Submission {
+            upsert(submission, into: &submissions)
         }
     }
 
@@ -24,6 +27,7 @@ final class MockDataSource: CloudKitManaging, @unchecked Sendable {
         lock.lock(); defer { lock.unlock() }
         if type == Challenge.self { return challenges as? [T] ?? [] }
         if type == CheckpointAssessment.self { return assessments as? [T] ?? [] }
+        if type == Submission.self { return submissions as? [T] ?? [] }
         return []
     }
 
@@ -33,6 +37,8 @@ final class MockDataSource: CloudKitManaging, @unchecked Sendable {
             challenges.removeAll { $0.id == challenge.id }
         } else if let assessment = model as? CheckpointAssessment {
             assessments.removeAll { $0.id == assessment.id }
+        } else if let submission = model as? Submission {
+            submissions.removeAll { $0.id == submission.id }
         }
     }
 

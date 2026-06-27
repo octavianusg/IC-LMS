@@ -4,6 +4,7 @@ struct ChallengeListView: View {
     @State private var viewModel: ChallengeListViewModel
     @State private var isPresentingNew = false
     @State private var newTitle = ""
+    @State private var studentRoute: StudentChallengeRoute?
     private let environment: AppEnvironment
 
     init(viewModel: ChallengeListViewModel, environment: AppEnvironment) {
@@ -40,6 +41,9 @@ struct ChallengeListView: View {
                     environment: environment
                 )
             }
+            .navigationDestination(item: $studentRoute) { route in
+                StudentChallengeView(viewModel: environment.makeStudentViewModel(for: route.challenge))
+            }
             .sheet(isPresented: $isPresentingNew) { newChallengeSheet }
             .errorAlert($viewModel.currentError)
             .task { await viewModel.load() }
@@ -57,6 +61,13 @@ struct ChallengeListView: View {
                         ChallengeCardView(challenge: challenge)
                     }
                     .buttonStyle(.plain)
+                    .contextMenu {
+                        Button {
+                            studentRoute = StudentChallengeRoute(challenge: challenge)
+                        } label: {
+                            Label("Open as student", systemImage: "graduationcap")
+                        }
+                    }
                 }
             }
             .padding(AppSpacing.lg)

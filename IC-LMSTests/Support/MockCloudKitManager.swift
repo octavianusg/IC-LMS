@@ -4,6 +4,7 @@ import CloudKit
 final class MockCloudKitManager: CloudKitManaging, @unchecked Sendable {
     var storedChallenges: [Challenge] = []
     var storedAssessments: [CheckpointAssessment] = []
+    var storedSubmissions: [Submission] = []
     var errorToThrow: AppError?
 
     private(set) var saveCount = 0
@@ -25,6 +26,8 @@ final class MockCloudKitManager: CloudKitManaging, @unchecked Sendable {
             upsert(challenge, into: &storedChallenges)
         } else if let assessment = model as? CheckpointAssessment {
             upsert(assessment, into: &storedAssessments)
+        } else if let submission = model as? Submission {
+            upsert(submission, into: &storedSubmissions)
         }
     }
 
@@ -33,6 +36,7 @@ final class MockCloudKitManager: CloudKitManaging, @unchecked Sendable {
         if let error = errorToThrow { throw error }
         if type == Challenge.self { return storedChallenges as? [T] ?? [] }
         if type == CheckpointAssessment.self { return storedAssessments as? [T] ?? [] }
+        if type == Submission.self { return storedSubmissions as? [T] ?? [] }
         return []
     }
 
@@ -43,6 +47,8 @@ final class MockCloudKitManager: CloudKitManaging, @unchecked Sendable {
             storedChallenges.removeAll { $0.id == challenge.id }
         } else if let assessment = model as? CheckpointAssessment {
             storedAssessments.removeAll { $0.id == assessment.id }
+        } else if let submission = model as? Submission {
+            storedSubmissions.removeAll { $0.id == submission.id }
         }
     }
 

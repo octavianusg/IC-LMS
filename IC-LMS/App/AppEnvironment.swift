@@ -73,6 +73,10 @@ final class AppEnvironment {
         ChallengeRunViewModel(challenge: challenge, log: log)
     }
 
+    func makeStudentViewModel(for challenge: Challenge) -> StudentChallengeViewModel {
+        StudentChallengeViewModel(challenge: challenge, cloudKit: activeSource, log: log)
+    }
+
     static func makeDefault() -> AppEnvironment {
         let log = LogManager()
         let cache = CoreDataCache(log: log)
