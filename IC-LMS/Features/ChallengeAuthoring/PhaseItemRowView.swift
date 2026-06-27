@@ -3,6 +3,7 @@ import SwiftUI
 struct PhaseItemRowView: View {
     let item: PhaseItem
     let accent: Color
+    var showsDisclosure: Bool = false
     let onDelete: () -> Void
 
     var body: some View {
@@ -25,7 +26,13 @@ struct PhaseItemRowView: View {
             }
             .buttonStyle(.plain)
             .foregroundStyle(AppColor.inkSecondary)
+            if showsDisclosure {
+                Image(systemName: "chevron.right")
+                    .font(AppFont.caption)
+                    .foregroundStyle(AppColor.inkSecondary)
+            }
         }
         .padding(.vertical, AppSpacing.xs)
+        .contentShape(.rect)
     }
 }

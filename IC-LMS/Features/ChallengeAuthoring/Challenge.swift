@@ -6,6 +6,7 @@ struct Challenge: Identifiable, Equatable, Hashable, Sendable {
     var title: String
     var summary: String
     var phases: [ChallengePhase]
+    var participants: [Participant]
     var ownerName: String
     var createdAt: Date
     var updatedAt: Date
@@ -15,6 +16,7 @@ struct Challenge: Identifiable, Equatable, Hashable, Sendable {
         title: String,
         summary: String = "",
         phases: [ChallengePhase] = PhaseKind.allCases.map { ChallengePhase(kind: $0) },
+        participants: [Participant] = [],
         ownerName: String = "",
         createdAt: Date = Date(),
         updatedAt: Date = Date()
@@ -23,6 +25,7 @@ struct Challenge: Identifiable, Equatable, Hashable, Sendable {
         self.title = title
         self.summary = summary
         self.phases = phases
+        self.participants = participants
         self.ownerName = ownerName
         self.createdAt = createdAt
         self.updatedAt = updatedAt
@@ -51,6 +54,23 @@ struct Challenge: Identifiable, Equatable, Hashable, Sendable {
         phases[index].items.removeAll { $0.id == id }
         updatedAt = Date()
     }
+
+    func checkpoints(in kind: PhaseKind) -> [Checkpoint] {
+        phase(kind).items.compactMap { item in
+            if case .checkpoint(let checkpoint) = item { return checkpoint }
+            return nil
+        }
+    }
+
+    mutating func addParticipant(name: String) {
+        participants.append(Participant(name: name))
+        updatedAt = Date()
+    }
+
+    mutating func removeParticipant(id: UUID) {
+        participants.removeAll { $0.id == id }
+        updatedAt = Date()
+    }
 }
 
 extension Challenge: CloudKitRecordConvertible {
@@ -60,6 +80,7 @@ extension Challenge: CloudKitRecordConvertible {
         static let title = "title"
         static let summary = "summary"
         static let phases = "phasesData"
+        static let participants = "participantsData"
         static let ownerName = "ownerName"
         static let createdAt = "createdAt"
         static let updatedAt = "updatedAt"
@@ -85,11 +106,20 @@ extension Challenge: CloudKitRecordConvertible {
             decodedPhases = PhaseKind.allCases.map { ChallengePhase(kind: $0) }
         }
 
+        let decodedParticipants: [Participant]
+        if let data = record[Field.participants] as? Data,
+           let participants = try? JSONDecoder().decode([Participant].self, from: data) {
+            decodedParticipants = participants
+        } else {
+            decodedParticipants = []
+        }
+
         self.init(
             id: recordID,
             title: title,
             summary: record[Field.summary] as? String ?? "",
             phases: decodedPhases,
+            participants: decodedParticipants,
             ownerName: record[Field.ownerName] as? String ?? "",
             createdAt: record[Field.createdAt] as? Date ?? Date(),
             updatedAt: record[Field.updatedAt] as? Date ?? Date()
@@ -105,6 +135,9 @@ extension Challenge: CloudKitRecordConvertible {
         record[Field.updatedAt] = updatedAt as CKRecordValue
         if let data = try? JSONEncoder().encode(phases) {
             record[Field.phases] = data as CKRecordValue
+        }
+        if let data = try? JSONEncoder().encode(participants) {
+            record[Field.participants] = data as CKRecordValue
         }
         return record
     }

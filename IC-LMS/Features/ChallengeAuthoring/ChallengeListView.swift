@@ -36,7 +36,8 @@ struct ChallengeListView: View {
             }
             .navigationDestination(for: Challenge.self) { challenge in
                 ChallengeEditorView(
-                    viewModel: dependencies.makeChallengeEditorViewModel(for: challenge)
+                    viewModel: dependencies.makeChallengeEditorViewModel(for: challenge),
+                    dependencies: dependencies
                 )
             }
             .sheet(isPresented: $isPresentingNew) { newChallengeSheet }

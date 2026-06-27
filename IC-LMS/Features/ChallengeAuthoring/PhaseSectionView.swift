@@ -2,6 +2,7 @@ import SwiftUI
 
 struct PhaseSectionView: View {
     let phase: ChallengePhase
+    let challengeID: UUID
     let onAdd: () -> Void
     let onDelete: (UUID) -> Void
 
@@ -16,9 +17,7 @@ struct PhaseSectionView: View {
                         emptyRow
                     } else {
                         ForEach(phase.items) { item in
-                            PhaseItemRowView(item: item, accent: accent) {
-                                onDelete(item.id)
-                            }
+                            row(for: item)
                             if item.id != phase.items.last?.id {
                                 Divider()
                             }
@@ -43,6 +42,22 @@ struct PhaseSectionView: View {
                 Label("Add", systemImage: "plus")
             }
             .buttonStyle(.appSecondary)
+        }
+    }
+
+    @ViewBuilder
+    private func row(for item: PhaseItem) -> some View {
+        if let checkpoint = item.checkpoint {
+            NavigationLink(value: CheckpointRoute(challengeID: challengeID, checkpoint: checkpoint)) {
+                PhaseItemRowView(item: item, accent: accent, showsDisclosure: true) {
+                    onDelete(item.id)
+                }
+            }
+            .buttonStyle(.plain)
+        } else {
+            PhaseItemRowView(item: item, accent: accent) {
+                onDelete(item.id)
+            }
         }
     }
 

@@ -29,6 +29,11 @@ enum PhaseItem: Identifiable, Codable, Equatable, Sendable {
         }
     }
 
+    var checkpoint: Checkpoint? {
+        if case .checkpoint(let item) = self { return item }
+        return nil
+    }
+
     var systemImage: String {
         switch self {
         case .content: return "doc.text"

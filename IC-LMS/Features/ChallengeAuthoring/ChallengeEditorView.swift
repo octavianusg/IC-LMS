@@ -3,18 +3,35 @@ import SwiftUI
 struct ChallengeEditorView: View {
     @State private var viewModel: ChallengeEditorViewModel
     @State private var addContext: AddItemContext?
+    @State private var isAddingParticipant = false
+    @State private var newParticipantName = ""
+    private let dependencies: AppDependencies
 
-    init(viewModel: ChallengeEditorViewModel) {
+    init(viewModel: ChallengeEditorViewModel, dependencies: AppDependencies) {
         _viewModel = State(initialValue: viewModel)
+        self.dependencies = dependencies
     }
+
+    private var challengeID: UUID { viewModel.challenge.id }
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: AppSpacing.xl) {
                 header
+                RosterSectionView(
+                    participants: viewModel.challenge.participants,
+                    onAdd: {
+                        newParticipantName = ""
+                        isAddingParticipant = true
+                    },
+                    onDelete: { id in
+                        Task { await viewModel.removeParticipant(id: id) }
+                    }
+                )
                 ForEach(viewModel.challenge.phases) { phase in
                     PhaseSectionView(
                         phase: phase,
+                        challengeID: challengeID,
                         onAdd: { addContext = AddItemContext(phase: phase.kind) },
                         onDelete: { itemID in
                             Task { await viewModel.removeItem(id: itemID, from: phase.kind) }
@@ -41,6 +58,29 @@ struct ChallengeEditorView: View {
                 onSubmit: { request in
                     Task { await handle(request, in: context.phase) }
                 }
+            )
+        }
+        .alert("Add Student", isPresented: $isAddingParticipant) {
+            TextField("Student name", text: $newParticipantName)
+            Button("Cancel", role: .cancel) {}
+            Button("Add") {
+                Task { await viewModel.addParticipant(name: newParticipantName) }
+            }
+        }
+        .navigationDestination(for: CheckpointRoute.self) { route in
+            CheckpointParticipantsView(
+                challengeID: route.challengeID,
+                checkpoint: route.checkpoint,
+                participants: viewModel.challenge.participants
+            )
+        }
+        .navigationDestination(for: ParticipantAssessmentRoute.self) { route in
+            CheckpointAssessmentView(
+                viewModel: dependencies.makeAssessmentViewModel(
+                    challengeID: route.challengeID,
+                    checkpoint: route.checkpoint,
+                    participant: route.participant
+                )
             )
         }
         .errorAlert($viewModel.currentError)

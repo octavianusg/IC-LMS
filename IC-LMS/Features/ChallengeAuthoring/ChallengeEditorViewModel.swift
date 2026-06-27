@@ -52,6 +52,17 @@ final class ChallengeEditorViewModel {
         await autosave()
     }
 
+    func addParticipant(name: String) async {
+        guard let validName = validatedTitle(name) else { return }
+        challenge.addParticipant(name: validName)
+        await autosave()
+    }
+
+    func removeParticipant(id: UUID) async {
+        challenge.removeParticipant(id: id)
+        await autosave()
+    }
+
     private func addItem(_ item: PhaseItem, to phase: PhaseKind) async {
         challenge.add(item, to: phase)
         await autosave()

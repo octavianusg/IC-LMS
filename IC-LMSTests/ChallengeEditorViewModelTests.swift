@@ -103,4 +103,38 @@ struct ChallengeEditorViewModelTests {
         #expect(viewModel.challenge.phase(.investigate).items.isEmpty)
         #expect(cloudKit.saveCount == 2)
     }
+
+    @Test func addParticipantAppendsToRosterAndAutosaves() async {
+        let cloudKit = MockCloudKitManager()
+        let viewModel = makeViewModel(cloudKit: cloudKit)
+
+        await viewModel.addParticipant(name: "  Bima  ")
+
+        #expect(viewModel.challenge.participants.map(\.name) == ["Bima"])
+        #expect(cloudKit.saveCount == 1)
+    }
+
+    @Test func addParticipantEmptyNameValidates() async {
+        let cloudKit = MockCloudKitManager()
+        let viewModel = makeViewModel(cloudKit: cloudKit)
+
+        await viewModel.addParticipant(name: "   ")
+
+        #expect(viewModel.challenge.participants.isEmpty)
+        #expect(cloudKit.saveCount == 0)
+        if case .validation = viewModel.currentError {} else {
+            Issue.record("Expected validation error")
+        }
+    }
+
+    @Test func removeParticipantDeletesFromRoster() async {
+        let cloudKit = MockCloudKitManager()
+        let viewModel = makeViewModel(cloudKit: cloudKit)
+        await viewModel.addParticipant(name: "Citra")
+        let id = viewModel.challenge.participants[0].id
+
+        await viewModel.removeParticipant(id: id)
+
+        #expect(viewModel.challenge.participants.isEmpty)
+    }
 }

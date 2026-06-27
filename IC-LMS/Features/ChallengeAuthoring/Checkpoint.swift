@@ -1,6 +1,6 @@
 import Foundation
 
-struct Checkpoint: Identifiable, Codable, Equatable, Sendable {
+struct Checkpoint: Identifiable, Codable, Equatable, Hashable, Sendable {
     var id: UUID
     var title: String
     var skillID: String
