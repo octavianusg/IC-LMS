@@ -72,11 +72,21 @@ methods:
       (non-offline) save failure the UI keeps the item but it isn't persisted.
       Add rollback if this matters.
 
-## 5. Info.plist
+## 5. Info.plist & brand fonts
 
 - [ ] No usage string is required for the photo **picker** (`PhotosPicker` runs
       out of process).
 - [ ] If you add **camera** capture later, add `NSCameraUsageDescription`.
+- [ ] **Bundle the brand fonts** (Innovation Cellar): add the **EB Garamond**
+      and **Montserrat** `.ttf` files (Google Fonts) to the target and register
+      them under **`UIAppFonts`** in Info.plist. `AppFont` references these
+      PostScript names and falls back to system fonts until they're added:
+      `EBGaramond-Regular/Medium/SemiBold/Bold`,
+      `Montserrat-Regular/Medium/SemiBold/Bold`. The app builds and runs without
+      them (system fallback); add them to match the brand exactly.
+- [ ] Verify the new brand palette on device: vibrant purple primary
+      (`#990FFA`/`#5E00B3`), rose accent (`#E60076`), soft‑lavender canvas, and
+      glassmorphic cards.
 
 ---
 

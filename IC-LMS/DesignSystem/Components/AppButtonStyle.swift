@@ -3,24 +3,26 @@ import SwiftUI
 struct PrimaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(AppFont.headline)
-            .foregroundStyle(AppColor.paperRaised)
+            .font(AppFont.button)
+            .foregroundStyle(.white)
             .padding(.vertical, AppSpacing.sm)
             .padding(.horizontal, AppSpacing.lg)
-            .background(AppColor.accent, in: .capsule)
-            .opacity(configuration.isPressed ? 0.7 : 1)
+            .background(AppColor.brandGradient, in: .capsule)
+            .opacity(configuration.isPressed ? 0.8 : 1)
+            .scaleEffect(configuration.isPressed ? 0.98 : 1)
+            .animation(.easeOut(duration: 0.15), value: configuration.isPressed)
     }
 }
 
 struct SecondaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(AppFont.headline)
-            .foregroundStyle(AppColor.ink)
+            .font(AppFont.button)
+            .foregroundStyle(AppColor.accent)
             .padding(.vertical, AppSpacing.sm)
             .padding(.horizontal, AppSpacing.lg)
             .glassEffect(.regular.interactive(), in: .capsule)
-            .opacity(configuration.isPressed ? 0.7 : 1)
+            .opacity(configuration.isPressed ? 0.8 : 1)
     }
 }
 

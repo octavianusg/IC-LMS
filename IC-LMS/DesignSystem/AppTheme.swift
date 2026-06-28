@@ -9,6 +9,6 @@ enum AppTheme {
 
 extension View {
     func appScreenBackground() -> some View {
-        background(AppColor.paper.ignoresSafeArea())
+        background(AppColor.canvasGradient.ignoresSafeArea())
     }
 }
