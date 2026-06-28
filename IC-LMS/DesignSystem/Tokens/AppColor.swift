@@ -10,6 +10,7 @@ enum AppColor {
     static let accentDeep = Color(red: 0.369, green: 0.0, blue: 0.702)
     static let rose = Color(red: 0.902, green: 0.0, blue: 0.463)
     static let lavender = Color(red: 0.93, green: 0.90, blue: 0.99)
+    static let glassStroke = Color.white.opacity(0.45)
 
     static let success = Color(red: 0.18, green: 0.49, blue: 0.36)
     static let warning = Color(red: 0.78, green: 0.55, blue: 0.16)

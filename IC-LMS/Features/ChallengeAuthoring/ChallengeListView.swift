@@ -136,6 +136,15 @@ private struct ChallengeCardView: View {
     var body: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                Capsule()
+                    .fill(
+                        LinearGradient(
+                            colors: PhaseKind.allCases.map(AppColor.phase),
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .frame(height: 4)
                 Text(challenge.title)
                     .font(AppFont.headline)
                     .foregroundStyle(AppColor.ink)
@@ -148,16 +157,12 @@ private struct ChallengeCardView: View {
                 }
                 Spacer(minLength: AppSpacing.sm)
                 HStack(spacing: AppSpacing.sm) {
-                    ForEach(PhaseKind.allCases) { phase in
-                        Circle()
-                            .fill(AppColor.phase(phase))
-                            .frame(width: 10, height: 10)
-                    }
+                    Label("\(challenge.participants.count)", systemImage: "person.2")
                     Spacer()
                     Text("\(challenge.itemCount) items")
-                        .font(AppFont.caption)
-                        .foregroundStyle(AppColor.inkSecondary)
                 }
+                .font(AppFont.caption)
+                .foregroundStyle(AppColor.inkSecondary)
             }
             .frame(maxWidth: .infinity, minHeight: 120, alignment: .topLeading)
         }

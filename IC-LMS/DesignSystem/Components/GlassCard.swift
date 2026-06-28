@@ -11,5 +11,17 @@ struct GlassCard<Content: View>: View {
         content
             .padding(AppSpacing.md)
             .glassEffect(.regular, in: .rect(cornerRadius: AppRadius.card))
+            .overlay {
+                RoundedRectangle(cornerRadius: AppRadius.card)
+                    .stroke(
+                        LinearGradient(
+                            colors: [AppColor.glassStroke, .clear],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        ),
+                        lineWidth: 1
+                    )
+            }
+            .cardShadow()
     }
 }

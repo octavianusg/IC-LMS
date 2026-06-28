@@ -8,6 +8,7 @@ struct PrimaryButtonStyle: ButtonStyle {
             .padding(.vertical, AppSpacing.sm)
             .padding(.horizontal, AppSpacing.lg)
             .background(AppColor.brandGradient, in: .capsule)
+            .shadow(color: AppColor.accent.opacity(0.35), radius: 10, x: 0, y: 5)
             .opacity(configuration.isPressed ? 0.8 : 1)
             .scaleEffect(configuration.isPressed ? 0.98 : 1)
             .animation(.easeOut(duration: 0.15), value: configuration.isPressed)
