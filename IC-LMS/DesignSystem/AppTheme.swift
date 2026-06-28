@@ -9,6 +9,12 @@ enum AppTheme {
 
 extension View {
     func appScreenBackground() -> some View {
-        background(AppColor.canvasGradient.ignoresSafeArea())
+        background {
+            ZStack {
+                AppColor.canvasGradient
+                OrganicBackdrop()
+            }
+            .ignoresSafeArea()
+        }
     }
 }

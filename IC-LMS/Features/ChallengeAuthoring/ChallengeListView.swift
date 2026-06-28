@@ -78,9 +78,16 @@ struct ChallengeListView: View {
 
     private var emptyState: some View {
         VStack(spacing: AppSpacing.md) {
-            Image(systemName: "books.vertical")
-                .font(.system(size: 52))
-                .foregroundStyle(AppColor.accent)
+            ZStack {
+                OrganicBlob()
+                    .fill(AppColor.brandGradient)
+                    .frame(width: 132, height: 132)
+                    .blur(radius: 18)
+                    .opacity(0.22)
+                Image(systemName: "books.vertical")
+                    .font(.system(size: 52))
+                    .foregroundStyle(AppColor.accent)
+            }
             Text("No challenges yet")
                 .font(AppFont.title2)
                 .foregroundStyle(AppColor.ink)

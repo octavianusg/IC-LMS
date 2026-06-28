@@ -67,9 +67,16 @@ struct ChallengeRunView: View {
 
     private var emptyState: some View {
         VStack(spacing: AppSpacing.md) {
-            Image(systemName: "play.slash")
-                .font(.system(size: 44))
-                .foregroundStyle(AppColor.inkSecondary)
+            ZStack {
+                OrganicBlob()
+                    .fill(AppColor.brandGradient)
+                    .frame(width: 120, height: 120)
+                    .blur(radius: 18)
+                    .opacity(0.20)
+                Image(systemName: "play.slash")
+                    .font(.system(size: 44))
+                    .foregroundStyle(AppColor.accent)
+            }
             Text("Nothing to run yet")
                 .font(AppFont.title2)
                 .foregroundStyle(AppColor.ink)
